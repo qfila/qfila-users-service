@@ -4,6 +4,7 @@ import {
   PrimaryGeneratedColumn,
   CreateDateColumn,
 } from 'typeorm';
+import { RolesEnum } from './enums/roles.enum';
 
 @Entity()
 export class User {
@@ -18,6 +19,9 @@ export class User {
 
   @Column({ length: 500 })
   password_hash: string;
+
+  @Column({ type: 'enum', enum: RolesEnum, default: RolesEnum.USER })
+  role: RolesEnum;
 
   @CreateDateColumn()
   created_at: Date;

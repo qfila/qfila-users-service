@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { User } from './user.entity';
 import { GetUserDTO } from './dtos/get-user.dto';
 import { CreateUserDTO } from './dtos/create-user.dto';
@@ -22,13 +22,36 @@ export class UserService {
     return user;
   }
 
-  async create({ email, password, username }: CreateUserDTO) {
-    const user = await this.userRepository.save({
-      email,
-      username,
-      password_hash: await hash(password, 10),
+  async findUsersByIds(usersIds: string[]) {
+    const users = await this.userRepository.find({
+      where: { id: In(usersIds) },
     });
 
-    return user;
+    return users;
+  }
+
+  async create({ email, password, username, role }: CreateUserDTO) {
+    try {
+      const user = await this.userRepository.save({
+        email,
+        username,
+        password_hash: await hash(password, 10),
+        role,
+      });
+
+      return user;
+    } catch (e) {
+      this.handleError(e);
+    }
+  }
+
+  private handleError(e: any) {
+    if (e?.code === 'ER_DUP_ENTRY') {
+      throw new BadRequestException(
+        'Já existe um usuário cadastrado com essas informações',
+      );
+    }
+
+    throw new Error('Não foi possível realizar o cadastro');
   }
 }

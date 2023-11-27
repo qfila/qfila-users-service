@@ -8,8 +8,12 @@ export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @Get('')
-  async getUsers(@Query('email') email?: string): Promise<User> {
+  async getUsers(
+    @Query('email') email?: string,
+    @Query('usersIds') usersIds?: string,
+  ): Promise<User | User[]> {
     if (email) return this.userService.getUser({ email });
+    if (usersIds) return this.userService.findUsersByIds(usersIds.split(','));
 
     return null;
   }
