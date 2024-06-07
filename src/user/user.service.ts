@@ -46,6 +46,8 @@ export class UserService {
   }
 
   private handleError(e: any) {
+    console.error(e);
+
     if (e?.code === 'ER_DUP_ENTRY') {
       throw new BadRequestException(
         'Já existe um usuário cadastrado com essas informações',
