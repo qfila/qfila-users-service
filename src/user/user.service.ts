@@ -5,6 +5,7 @@ import { User } from './user.entity';
 import { GetUserDTO } from './dtos/get-user.dto';
 import { CreateUserDTO } from './dtos/create-user.dto';
 import { hash } from 'bcrypt';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class UserService {
@@ -33,6 +34,7 @@ export class UserService {
   async create({ email, password, username, role }: CreateUserDTO) {
     try {
       const user = await this.userRepository.save({
+        id: crypto.randomUUID(),
         email,
         username,
         password_hash: await hash(password, 10),
